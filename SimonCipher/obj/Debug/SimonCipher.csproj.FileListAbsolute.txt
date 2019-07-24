@@ -1,9 +1,0 @@
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\bin\Debug\SimonCipher.exe.config
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\bin\Debug\SimonCipher.exe
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\bin\Debug\SimonCipher.pdb
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.csprojAssemblyReference.cache
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.csproj.CoreCompileInputs.cache
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.exe
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.pdb
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.Form1.resources
-C:\Users\FacundoBistolfi\source\repos\SimonCipher\SimonCipher\obj\Debug\SimonCipher.csproj.GenerateResource.cache
