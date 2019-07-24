@@ -43,7 +43,7 @@ namespace SimonCipher
 
         private void btnCifrar_Click(object sender, EventArgs e)
         {
-            tbSalida.Text = (simonCipher.cifrarMensaje(
+            tbSalida.Text = Encoding.Unicode.GetString(simonCipher.cifrar(
                 Encoding.Unicode.GetBytes(tbKey.Text),
                 Encoding.Unicode.GetBytes(tbEntrada.Text)
             ));
@@ -52,7 +52,7 @@ namespace SimonCipher
 
         private void btnDesc_Click(object sender, EventArgs e)
         {
-            tbSalida.Text = (simonCipher.descifrarMensaje(
+            tbSalida.Text = Encoding.Unicode.GetString(simonCipher.descifrar(
                 Encoding.Unicode.GetBytes(tbKey.Text),
                 Encoding.Unicode.GetBytes(tbEntrada.Text)
             ));

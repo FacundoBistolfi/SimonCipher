@@ -9,6 +9,9 @@ namespace SimonCipher
     class Simon
 
     {
+
+        #region Declaracion de variables y constructor
+
         //Paper:
         //https://eprint.iacr.org/2013/404.pdf
 
@@ -43,6 +46,11 @@ namespace SimonCipher
             //keys = keyExpansion();
         }
 
+        #endregion
+
+        #region Funciones de cifrado y descifrado
+
+        /*
         public byte[] cifrar(byte[] key, byte[] msg)
         {
             ulong[] cif = cifrar(byteToUlongs(key), byteToUlongs(msg));
@@ -56,6 +64,41 @@ namespace SimonCipher
 
             return null;
         }
+        */
+
+        public byte[] cifrar(byte[] key, byte[] msg)
+        {
+
+            ulong[] keyU = byteToUlongs(key);
+            ulong[] msgU = byteToUlongs(msg);
+
+            ulong[] cifrado = new ulong[msgU.Length];
+            for (int i = 0; i < msgU.Length / 2; i++)
+            {
+                ulong[] cif = cifrarBloque(keyExpansion(keyU), new ulong[] { msgU[i], msgU[i + 1] });
+                cifrado[i] = cif[0];
+                cifrado[i + 1] = cif[1];
+            }
+
+            return ulongToByte(cifrado);
+
+        }
+
+        public byte[] descifrar(byte[] key, byte[] msg)
+        {
+            ulong[] keyU = byteToUlongs(key);
+            ulong[] msgU = byteToUlongs(msg);
+
+            ulong[] descifrado = new ulong[msg.Length];
+            for (int i = 0; i < msgU.Length / 2; i++)
+            {
+                ulong[] des = descifrarBloque(keyExpansion(keyU), new ulong[] { msgU[i], msgU[i + 1] });
+                descifrado[i] = des[0];
+                descifrado[i + 1] = des[1];
+            }
+            return ulongToByte(descifrado);
+        }
+
 
         private ulong[] cifrar(ulong[] key, ulong[] msg)
         {
@@ -66,9 +109,7 @@ namespace SimonCipher
                 cifrado[i + 1] = cif[1];
             }
             return cifrado;
-        }
-
-        
+        }      
 
         private ulong[] descifrar(ulong[] key, ulong[] msg)
         {
@@ -81,6 +122,8 @@ namespace SimonCipher
             }
             return descifrado;
         }
+
+        #endregion
 
         #region Funciones de cifrado y descifrado de bloque
 
@@ -98,7 +141,7 @@ namespace SimonCipher
 
         private ulong[] descifrarBloque(ulong[] keys, ulong[] msg)
         {
-            for (int i = t; i >= 0; i--)
+            for (int i = t-1; i >= 0; i--)
             {
                 ulong tmp = msg[1];
                 msg[1] = msg[0] ^ (rotl(msg[0], 1) + rotl(msg[0], 8)) ^ rotl(msg[0], 2) ^ keys[i];
@@ -213,6 +256,21 @@ namespace SimonCipher
             return decoded;
         }
 
+        public byte[] ulongToByte(ulong[] array)
+        {
+            byte[] bytes = new byte[array.Length * 8];
+
+            for(int i=0; i<array.Length; i++)
+            {
+                byte[] bytesUlong = BitConverter.GetBytes(array[i]);
+                for(int j = 0; j<bytesUlong.Length; j++)
+                {
+                    bytes[i * 8 + j] = bytesUlong[j];
+                }
+            }
+
+            return bytes;
+        }
               
 
         #endregion
