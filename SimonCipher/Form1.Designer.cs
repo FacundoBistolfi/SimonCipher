@@ -109,10 +109,12 @@
             // rb128
             // 
             this.rb128.AutoSize = true;
+            this.rb128.Checked = true;
             this.rb128.Location = new System.Drawing.Point(6, 18);
             this.rb128.Name = "rb128";
             this.rb128.Size = new System.Drawing.Size(66, 17);
             this.rb128.TabIndex = 7;
+            this.rb128.TabStop = true;
             this.rb128.Text = "128/128";
             this.rb128.UseVisualStyleBackColor = true;
             this.rb128.Click += new System.EventHandler(this.rb128_Click);
@@ -152,6 +154,7 @@
             this.btnDesc.TabIndex = 9;
             this.btnDesc.Text = "Descifrar";
             this.btnDesc.UseVisualStyleBackColor = true;
+            this.btnDesc.Click += new System.EventHandler(this.btnDesc_Click);
             // 
             // label2
             // 

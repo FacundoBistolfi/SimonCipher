@@ -43,7 +43,31 @@ namespace SimonCipher
 
         private void btnCifrar_Click(object sender, EventArgs e)
         {
-            simonCipher.cifrarMensaje
+            tbSalida.Text = (simonCipher.cifrarMensaje(
+                Encoding.Unicode.GetBytes(tbKey.Text),
+                Encoding.Unicode.GetBytes(tbEntrada.Text)
+            ));
+
+        }
+
+        private void btnDesc_Click(object sender, EventArgs e)
+        {
+            tbSalida.Text = (simonCipher.descifrarMensaje(
+                Encoding.Unicode.GetBytes(tbKey.Text),
+                Encoding.Unicode.GetBytes(tbEntrada.Text)
+            ));
+        }
+
+
+        //Funcion que convierte un array de ulong a un string (En ASCII)
+        public String ulongToString(ulong[] array)
+        {
+            String decoded = "";
+            for (int i = 0; i < array.Length; i++)
+            {
+                decoded += Encoding.Unicode.GetString(BitConverter.GetBytes(array[i]));
+            }
+            return decoded;
         }
     }
 

@@ -39,58 +39,54 @@ namespace SimonCipher
             if ((n == 64) && (m == 2)) { j = 2; t = 68; }
             if ((n == 64) && (m == 3)) { j = 3; t = 69; }
             if ((n == 64) && (m == 4)) { j = 4; t = 72; }
-
-
-            mod = (ulong)Math.Pow(2, n);
+            //mod = (ulong)Math.Pow(2, n);
             //keys = keyExpansion();
         }
 
-        //Funcion de expansion de key
-        private ulong[] keyExpansion(ulong[] key)
+        public byte[] cifrar(byte[] key, byte[] msg)
         {
-            ulong[] keys = new ulong[t];
-            for(int i = 0; i<m; i++)
-            {
-                keys[i] = key[i];
-            }
+            ulong[] cif = cifrar(byteToUlongs(key), byteToUlongs(msg));
 
-            ulong zet = z[j];
-            ulong tmp;
-            for(int i = m; i<t; i++)
-            {
-                tmp = rotl(key[i - 1], 3);
-                if (m == 4) tmp = tmp ^ key[i-3];
-                tmp = tmp ^ rotl(tmp, 1);
-                key[i] = key[i - m] ^ tmp ^ getNBits(rotl(zet,i-m)) ^ (ulong.MaxValue -3);
-                keys[i] = key[i];
-            }
-            return keys;
+            return null;
         }
 
-        //Bitshitf rotate
-        private ulong rotl(ulong bloque, int cant)
+        public byte[] descifrar(byte[] key, byte[] msg)
         {
-            return ((bloque << cant) + (bloque >> (n - cant))) % mod;
+            ulong[] des = descifrar(byteToUlongs(key), byteToUlongs(msg));
+
+            return null;
         }
 
-        //Get n keys
-        private ulong getNBits(ulong bloque)
-        {
-            return bloque >> (62 - n);
-        }
-
-        public ulong[] cifrarMensaje(ulong[] key, ulong[] msg)
+        private ulong[] cifrar(ulong[] key, ulong[] msg)
         {
             ulong[] cifrado = new ulong[msg.Length];
             for(int i = 0; i< msg.Length/2; i++) { 
-                ulong[] cif = cifrar(new ulong[]{ msg[i], msg[i + 1] }, keyExpansion(key));
+                ulong[] cif = cifrarBloque( keyExpansion(key), new ulong[] { msg[i], msg[i + 1] });
                 cifrado[i] = cif[0];
                 cifrado[i + 1] = cif[1];
             }
             return cifrado;
         }
 
-        private ulong[] cifrar(ulong[] keys, ulong[] msg)
+        
+
+        private ulong[] descifrar(ulong[] key, ulong[] msg)
+        {
+            ulong[] descifrado = new ulong[msg.Length];
+            for (int i = 0; i < msg.Length / 2; i++)
+            {
+                ulong[] des = descifrarBloque(keyExpansion(key), new ulong[] { msg[i], msg[i + 1] });
+                descifrado[i] = des[0];
+                descifrado[i + 1] = des[1];
+            }
+            return descifrado;
+        }
+
+        #region Funciones de cifrado y descifrado de bloque
+
+        // FUNCIONES DE CIFRADO DE BLOQUE
+
+        private ulong[] cifrarBloque(ulong[] keys, ulong[] msg)
         {
             for(int i=0; i<t; i++)
             {
@@ -100,7 +96,7 @@ namespace SimonCipher
             return msg;
         }
 
-        private ulong[] descifrar(ulong[] keys, ulong[] msg)
+        private ulong[] descifrarBloque(ulong[] keys, ulong[] msg)
         {
             for (int i = t; i >= 0; i--)
             {
@@ -111,7 +107,114 @@ namespace SimonCipher
             return msg;
         }
 
-        //Funciones de conversión
+        #endregion
 
+        #region Funcion de expansion de key
+
+        //  FUNCION DE EXPANSION DE KEY
+
+        private ulong[] keyExpansion(ulong[] key)
+        {
+            if (key.Length != m)
+            {
+                ulong[] temp = key;
+                key = new ulong[m];
+                temp.CopyTo(key, 0);
+            }
+            ulong[] keys = new ulong[t];
+            for (int i = 0; i < m; i++)
+            {
+                keys[i] = key[i];
+            }
+
+            ulong zet = z[j];
+            ulong tmp;
+            for (int i = m; i < t; i++)
+            {
+                tmp = rotl(keys[i - 1], 3);
+                if (m == 4) tmp = tmp ^ keys[i - 3];
+                tmp = tmp ^ rotl(tmp, 1);
+                keys[i] = keys[i - m] ^ tmp ^ getNBits(rotl(zet, i - m)) ^ (ulong.MaxValue - 3);
+                //keys[i] = key[i];
+            }
+            return keys;
+        }
+
+        #endregion
+
+        #region Operaciones aritmeticas
+        //OPERACIONES ARITMETICAS
+
+        //Bitshitf rotate
+        private ulong rotl(ulong bloque, int cant)
+        {
+            //return ((bloque << cant) + (bloque >> (n - cant))) % mod;
+            return ((bloque << cant) + (bloque >> (n - cant)));
+        }
+
+        //Get n keys
+        private ulong getNBits(ulong bloque)
+        {
+            return bloque >> (62 - n);
+        }
+        #endregion
+
+        #region Funciones de conversion
+        // FUNCIONES DE CONVERSION
+
+        //Conversiones entre arrays de words de 64 bytes (ulongs), Strings y arrays de bytes
+
+        //Funcion que convierte un string a un array de ulongs , se puede seleccionar tambien una cantidad minima de bytes
+        //(si sobran se rellenan con ceros)
+        public ulong[] stringToUlongs(String s)
+        {
+            return stringToUlongs(s, 0);
+        }
+        public ulong[] stringToUlongs(String s, int minBytes)
+        {
+            //Paso la cadena a un array de bytes
+            return byteToUlongs(Encoding.ASCII.GetBytes(s), minBytes);
+        }
+
+
+        //Funcion que convierte un array de bytes en un array de ulong
+        public ulong[] byteToUlongs(byte[] bytes, int minBytes)
+        {
+            //Paso el array a otro que tenga grupos de 4 bytes formados   
+            int cant = (bytes.Length % 8 == 0) ? bytes.Length : bytes.Length + (8 - bytes.Length % 8);
+            if (cant < minBytes) cant = minBytes;
+            byte[] b = new byte[cant];
+            bytes.CopyTo(b, 0);
+
+            //Creo el array de words (8 bytes)
+            ulong[] c = new ulong[b.Length / 8];
+
+            //Hago el pasaje de bytes a words
+            for (int i = 0; i < c.Length; i++)
+                c[i] = BitConverter.ToUInt64(b, i * 8);
+
+            return c;
+        }
+
+        //Sobrecarga de la funcion
+        public ulong[] byteToUlongs(byte[] bytes)
+        {
+            return byteToUlongs(bytes, 0);
+        }
+
+        //Funcion que convierte un array de ulong a un string (En ASCII)
+        public String ulongToString(ulong[] array)
+        {
+            String decoded = "";
+            for (int i = 0; i < array.Length; i++)
+            {
+                decoded += Encoding.ASCII.GetString(BitConverter.GetBytes(array[i]));
+            }
+            return decoded;
+        }
+
+              
+
+        #endregion
     }
 }
