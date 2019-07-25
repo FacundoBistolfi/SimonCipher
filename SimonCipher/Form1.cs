@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Windows.Forms;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace SimonCipher
 {
@@ -34,28 +35,72 @@ namespace SimonCipher
             if (rb1.Checked) { blockSize = 96; keySize = 96; }
             if (rb1.Checked) { blockSize = 96; keySize = 144; }
             */
-            if (rb128.Checked) { blockSize = 128; keySize = 128; }
-            if (rb192.Checked) { blockSize = 128; keySize = 192; }
-            if (rb256.Checked) { blockSize = 128; keySize = 256; }
-            label4.Text = keySize + " size";
+            if (rb128.Checked) { blockSize = 128; keySize = 128; tbKey.Text = ""; tbKey.MaxLength = 16; }
+            if (rb192.Checked) { blockSize = 128; keySize = 192; tbKey.Text = ""; tbKey.MaxLength = 24; }
+            if (rb256.Checked) { blockSize = 128; keySize = 256; tbKey.Text = ""; tbKey.MaxLength = 32; }
+            label4.Text = keySize + " bits";
             simonCipher = new Simon(blockSize, keySize);
         }
 
         private void btnCifrar_Click(object sender, EventArgs e)
         {
-            tbSalida.Text = Encoding.Unicode.GetString(simonCipher.cifrar(
-                Encoding.Unicode.GetBytes(tbKey.Text),
-                Encoding.Unicode.GetBytes(tbEntrada.Text)
-            ));
+            //var watch = System.Diagnostics.Stopwatch.StartNew();
+            FileStream inFs = new FileStream(tbEntrada.Text, FileMode.Open, FileAccess.Read);
+            FileStream outFs = new FileStream(tbSalida.Text, FileMode.Create);
+            byte[] bufferIn = new byte[16];
+            int fileOffset = 0;
+            ulong i = 0;
+
+            simonCipher.calcularKeys(Encoding.ASCII.GetBytes(tbKey.Text));
+
+            while (fileOffset < inFs.Length)
+            {
+                inFs.Seek(fileOffset, SeekOrigin.Begin);
+                bufferIn = new byte[16];
+                int bytesRead = inFs.Read(bufferIn, 0, 16);
+
+                outFs.Write(simonCipher.cifrarBloque(bufferIn), 0, 16);
+                fileOffset += 16;
+                i++;
+            }
+            
+            inFs.Close();
+            outFs.Close();
+            //watch.Stop();
+            //tbTime.Text = watch.ElapsedMilliseconds.ToString();
+            
 
         }
 
         private void btnDesc_Click(object sender, EventArgs e)
         {
-            tbSalida.Text = Encoding.Unicode.GetString(simonCipher.descifrar(
-                Encoding.Unicode.GetBytes(tbKey.Text),
-                Encoding.Unicode.GetBytes(tbEntrada.Text)
-            ));
+            //var watch = System.Diagnostics.Stopwatch.StartNew();
+            FileStream inFs = new FileStream(tbEntrada.Text, FileMode.Open, FileAccess.Read);
+            FileStream outFs = new FileStream(tbSalida.Text, FileMode.Create);
+            byte[] bufferIn = new byte[16];
+            int fileOffset = 0;
+            ulong i = 0;
+
+            simonCipher.calcularKeys(Encoding.ASCII.GetBytes(tbKey.Text));
+
+            while (fileOffset < inFs.Length)
+            {
+                inFs.Seek(fileOffset, SeekOrigin.Begin);
+                bufferIn = new byte[16];
+                int bytesRead = inFs.Read(bufferIn, 0, 16);
+
+                
+
+                outFs.Write(simonCipher.descifrarBloque(bufferIn), 0, 16);
+                fileOffset += 16;
+                i++;
+            }
+
+            inFs.Close();
+            outFs.Close();
+            //watch.Stop();
+            //tbTime.Text = watch.ElapsedMilliseconds.ToString();
+
         }
 
 
@@ -68,6 +113,46 @@ namespace SimonCipher
                 decoded += Encoding.Unicode.GetString(BitConverter.GetBytes(array[i]));
             }
             return decoded;
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog fd = new OpenFileDialog())
+            {
+                fd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                fd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                fd.FilterIndex = 2;
+                fd.RestoreDirectory = true;
+
+                if (fd.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    tbEntrada.Text = fd.FileName;
+                }
+            }
+
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog fd = new SaveFileDialog())
+            {
+                fd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                fd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                fd.FilterIndex = 2;
+                fd.RestoreDirectory = true;
+
+                if (fd.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    tbSalida.Text = fd.FileName;
+                }
+            }
+        }
+
+        private void Rb128_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 
